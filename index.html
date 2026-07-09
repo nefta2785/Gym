@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  * { -webkit-tap-highlight-color: transparent; }
+  ::-webkit-scrollbar { display: none; }
+  a { color: #FF4A1C; }
+  a:hover { color: #ff6a44; }
+  input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  @keyframes riseIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes sheetUp { from { transform: translateY(100%); } to { transform: none; } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes popIn { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+</style>
+</helmet>
+
+<div style="position:relative; width:100%; max-width:480px; height:100%; min-height:760px; margin:0 auto; background:#0B0C0E; color:#F3F1EC; font-family:'Archivo',system-ui,sans-serif; overflow:hidden; border-radius:0;">
+
+  <!-- ══════════════ SCROLL AREA ══════════════ -->
+  <div style="position:absolute; top:0; left:0; right:0; bottom:86px; overflow-y:auto; -webkit-overflow-scrolling:touch;">
+
+    <!-- ────────── TAB: HOY ────────── -->
+    <sc-if value="{{ isHoy }}" hint-placeholder-val="{{ true }}">
+    <div style="padding:28px 20px 28px;">
+      <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:12px; animation:riseIn .5s ease both;">
+        <div style="flex:1; min-width:0;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:2px; color:#8B9096; text-transform:uppercase;">{{ todayLabel }}</div>
+          <div style="font-family:'Anton',sans-serif; font-size:34px; line-height:1.02; letter-spacing:.5px; margin-top:6px; word-break:break-word;">HOLA, {{ athleteName }}</div>
+        </div>
+        <div style="text-align:center; flex-shrink:0; padding-left:12px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:26px; font-weight:700; color:{{ A }};">{{ streak }}</div>
+          <div style="font-size:9px; letter-spacing:1.5px; color:#8B9096; text-transform:uppercase;">entrenos 🔥</div>
+        </div>
+      </div>
+
+      <!-- week strip -->
+      <div style="display:flex; gap:7px; margin-top:28px; animation:riseIn .5s .05s ease both;">
+        <sc-for list="{{ weekStrip }}" as="d" hint-placeholder-count="7">
+          <button onClick="{{ d.onClick }}" style="flex:1; border:none; cursor:pointer; padding:10px 0 8px; border-radius:13px; background:{{ d.bg }}; border:1px solid {{ d.border }}; display:flex; flex-direction:column; align-items:center; gap:8px;">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:{{ d.labelColor }};">{{ d.d }}</span>
+            <span style="width:8px; height:8px; border-radius:50%; background:{{ d.dot }};"></span>
+          </button>
+        </sc-for>
+      </div>
+
+      <!-- today's session card -->
+      <div style="margin-top:22px; border-radius:22px; overflow:hidden; background:linear-gradient(160deg,#1D2026,#141519); border:1px solid rgba(255,255,255,.08); animation:riseIn .5s .1s ease both;">
+        <div style="padding:20px 20px 0;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="width:9px; height:9px; border-radius:50%; background:{{ today.accent }};"></span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1.5px; color:#8B9096; text-transform:uppercase;">{{ today.kicker }} · {{ today.name }}</span>
+          </div>
+          <div style="font-family:'Anton',sans-serif; font-size:30px; line-height:1; margin-top:12px; text-transform:uppercase;">{{ today.focus }}</div>
+          <div style="display:flex; gap:18px; margin-top:14px;">
+            <div style="display:flex; align-items:center; gap:6px;"><span style="color:#8B9096; font-size:13px;">⏱</span><span style="font-family:'JetBrains Mono',monospace; font-size:13px; color:#C9CDD3;">{{ today.dur }}</span></div>
+            <div style="display:flex; align-items:center; gap:6px;"><span style="color:#8B9096; font-size:13px;">◼</span><span style="font-family:'JetBrains Mono',monospace; font-size:13px; color:#C9CDD3;">{{ today.count }} ejercicios</span></div>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:1px; margin-top:18px; background:rgba(255,255,255,.06);">
+          <sc-for list="{{ today.preview }}" as="e" hint-placeholder-count="3">
+            <button onClick="{{ e.onOpen }}" style="border:none; cursor:pointer; text-align:left; background:#16181C; padding:12px 20px; display:flex; align-items:center; gap:12px;">
+              <span style="width:26px; height:26px; border-radius:8px; flex-shrink:0; background:{{ e.catColor }}22; color:{{ e.catColor }}; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;">{{ e.n }}</span>
+              <span style="flex:1; font-size:14px; font-weight:600; color:#E8E6E1;">{{ e.name }}</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#8B9096;">{{ e.reps }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <div style="padding:16px 20px 20px; background:#16181C;">
+          <button onClick="{{ startToday }}" style="width:100%; border:none; cursor:pointer; padding:16px; border-radius:14px; background:{{ A }}; color:#0B0C0E; font-family:'Anton',sans-serif; font-size:18px; letter-spacing:1px; text-transform:uppercase;">Empezar entreno ▸</button>
+        </div>
+      </div>
+
+      <!-- next bjj + focus -->
+      <div style="display:flex; gap:12px; margin-top:14px; animation:riseIn .5s .15s ease both;">
+        <div style="flex:1; border-radius:18px; background:#15171B; border:1px solid rgba(255,255,255,.07); padding:16px;">
+          <div style="font-size:10px; letter-spacing:1.5px; color:#8B9096; text-transform:uppercase;">Próximo BJJ</div>
+          <div style="font-family:'Anton',sans-serif; font-size:22px; margin-top:8px;">{{ nextBjj }}</div>
+          <div style="font-size:12px; color:#8B9096;">19:30 · Sparring</div>
+        </div>
+        <div style="flex:1; border-radius:18px; background:#15171B; border:1px solid rgba(255,255,255,.07); padding:16px;">
+          <div style="font-size:10px; letter-spacing:1.5px; color:#8B9096; text-transform:uppercase;">Esta semana</div>
+          <div style="font-family:'Anton',sans-serif; font-size:22px; margin-top:8px; color:{{ A }};">{{ weekCount }}</div>
+          <div style="font-size:12px; color:#8B9096;">sesiones del plan</div>
+        </div>
+      </div>
+
+      <div style="margin-top:18px; font-size:11px; line-height:1.5; color:#7A8087; text-align:center; animation:riseIn .5s .2s ease both;">Guía educativa. Consulta a un profesional antes de iniciar el programa.</div>
+    </div>
+    </sc-if>
+
+    <!-- ────────── TAB: SEMANA ────────── -->
+    <sc-if value="{{ isSemana }}" hint-placeholder-val="{{ true }}">
+    <div style="padding:28px 20px 28px;">
+      <div style="font-family:'Anton',sans-serif; font-size:34px; letter-spacing:.5px;">LA SEMANA</div>
+      <div style="font-size:13px; color:#8B9096; margin-top:4px;">2 full body (Lun/Mié) con acondicionamiento integrado al final, intercalados con tu JiuJitsu.</div>
+      <div style="display:flex; flex-direction:column; gap:10px; margin-top:20px;">
+        <sc-for list="{{ weekFull }}" as="d" hint-placeholder-count="7">
+          <div style="border-radius:18px; background:{{ d.cardBg }}; border:1px solid {{ d.cardBorder }}; overflow:hidden;">
+            <div style="display:flex; align-items:center; gap:14px; padding:16px 18px;">
+              <div style="width:44px; text-align:center; flex-shrink:0;">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1px; color:{{ d.accent }};">{{ d.d }}</div>
+                <div style="font-family:'Anton',sans-serif; font-size:20px; color:#F3F1EC; line-height:1;">{{ d.num }}</div>
+              </div>
+              <div style="width:1px; align-self:stretch; background:rgba(255,255,255,.08);"></div>
+              <div style="flex:1;">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:{{ d.accent }}; text-transform:uppercase;">{{ d.kind }}</div>
+                <div style="font-family:'Anton',sans-serif; font-size:19px; text-transform:uppercase; line-height:1.05; margin-top:3px; color:#F3F1EC;">{{ d.title }}</div>
+              </div>
+              <div style="font-size:20px;">{{ d.icon }}</div>
+            </div>
+            <sc-if value="{{ d.hasList }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; flex-direction:column; gap:1px; background:rgba(255,255,255,.06); border-top:1px solid rgba(255,255,255,.06);">
+              <sc-for list="{{ d.exs }}" as="e" hint-placeholder-count="4">
+                <button onClick="{{ e.onOpen }}" style="border:none; cursor:pointer; text-align:left; background:{{ d.rowBg }}; padding:11px 18px; display:flex; align-items:center; gap:11px;">
+                  <span style="width:6px; height:6px; border-radius:50%; background:{{ e.catColor }}; flex-shrink:0;"></span>
+                  <span style="flex:1; font-size:13px; font-weight:600; color:#D7D5D0;">{{ e.name }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#8B9096;">{{ e.reps }}</span>
+                  <span style="color:#7A8087; font-size:11px;">ⓘ</span>
+                </button>
+              </sc-for>
+            </div>
+            <div style="padding:12px 18px 16px; background:#15171B;">
+              <button onClick="{{ d.onStart }}" style="width:100%; border:none; cursor:pointer; padding:13px; border-radius:12px; background:{{ d.startBg }}; color:{{ d.startColor }}; font-family:'Anton',sans-serif; font-size:15px; letter-spacing:1px; text-transform:uppercase;">{{ d.startLabel }}</button>
+            </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ────────── TAB: REGISTRO ────────── -->
+    <sc-if value="{{ isRegistro }}" hint-placeholder-val="{{ true }}">
+    <div style="padding:28px 20px 28px;">
+      <div style="font-family:'Anton',sans-serif; font-size:34px; letter-spacing:.5px;">PROGRESO</div>
+      <div style="font-size:13px; color:#8B9096; margin-top:4px;">Calculado de tus entrenos registrados.</div>
+
+      <div style="margin-top:20px; border-radius:20px; background:#15171B; border:1px solid rgba(255,255,255,.07); padding:18px;">
+        <div style="display:flex; align-items:baseline; justify-content:space-between;">
+          <div style="font-size:11px; letter-spacing:1.5px; color:#8B9096; text-transform:uppercase;">Volumen por sesión (kg)</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:12px; color:{{ A }};">{{ volDelta }}</div>
+        </div>
+        <div style="margin-top:14px;">{{ volumeChart }}</div>
+      </div>
+
+      <div style="margin-top:14px; border-radius:20px; background:#15171B; border:1px solid rgba(255,255,255,.07); padding:18px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:11px; letter-spacing:1.5px; color:#8B9096; text-transform:uppercase;">Agarre · Carga en carries (kg)</span>
+        </div>
+        <div style="margin-top:14px;">{{ gripChart }}</div>
+      </div>
+
+      <div style="font-size:11px; letter-spacing:1.5px; color:#8B9096; text-transform:uppercase; margin:22px 4px 10px;">Récords personales</div>
+      <sc-if value="{{ prsHas }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:1px; border-radius:18px; overflow:hidden; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.07);">
+        <sc-for list="{{ prs }}" as="p" hint-placeholder-count="4">
+          <div style="background:#15171B; padding:15px 18px; display:flex; align-items:center; gap:12px;">
+            <span style="font-size:16px;">🏆</span>
+            <span style="flex:1; font-size:14px; font-weight:600;">{{ p.lift }}</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:700; color:{{ A }};">{{ p.val }}</span>
+          </div>
+        </sc-for>
+      </div>
+      </sc-if>
+      <sc-if value="{{ prsEmpty }}" hint-placeholder-val="{{ true }}">
+      <div style="border-radius:18px; border:1px dashed rgba(255,255,255,.12); padding:22px 18px; text-align:center; font-size:13px; color:#7A8087; line-height:1.5;">Aún no hay récords. Completa y guarda tu primer entreno para empezar a medir.</div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <!-- ────────── TAB: BIBLIOTECA ────────── -->
+    <sc-if value="{{ isBiblioteca }}" hint-placeholder-val="{{ true }}">
+    <div style="padding:28px 20px 28px;">
+      <div style="font-family:'Anton',sans-serif; font-size:34px; letter-spacing:.5px;">BIBLIOTECA</div>
+      <div style="font-size:13px; color:#8B9096; margin-top:4px;">{{ libCount }} ejercicios con base científica.</div>
+
+      <input value="{{ q }}" onInput="{{ onSearch }}" placeholder="Buscar ejercicio…" style="width:100%; box-sizing:border-box; margin-top:16px; padding:13px 16px; border-radius:13px; background:#15171B; border:1px solid rgba(255,255,255,.09); color:#F3F1EC; font-family:'Archivo',sans-serif; font-size:15px; outline:none;" />
+
+      <div style="display:flex; gap:8px; margin-top:14px; overflow-x:auto; padding-bottom:2px;">
+        <sc-for list="{{ cats }}" as="c" hint-placeholder-count="6">
+          <button onClick="{{ c.onClick }}" style="flex-shrink:0; border:1px solid {{ c.border }}; cursor:pointer; padding:7px 14px; border-radius:999px; background:{{ c.bg }}; color:{{ c.color }}; font-size:12px; font-weight:600; white-space:nowrap;">{{ c.label }}</button>
+        </sc-for>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:9px; margin-top:16px;">
+        <sc-for list="{{ libList }}" as="e" hint-placeholder-count="6">
+          <button onClick="{{ e.onOpen }}" style="border:none; cursor:pointer; text-align:left; width:100%; border-radius:16px; background:#15171B; border:1px solid rgba(255,255,255,.07); padding:14px 16px; display:flex; align-items:center; gap:13px;">
+            <span style="width:38px; height:38px; border-radius:11px; flex-shrink:0; background:{{ e.catColor }}1f; color:{{ e.catColor }}; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; letter-spacing:.5px;">{{ e.abbr }}</span>
+            <span style="flex:1; min-width:0;">
+              <span style="display:block; font-size:15px; font-weight:600; color:#F3F1EC;">{{ e.name }}</span>
+              <span style="display:block; font-size:11px; color:#8B9096; margin-top:2px;">{{ e.cat }} · {{ e.equip }}</span>
+            </span>
+            <span style="color:#7A8087; font-size:16px;">›</span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+  </div>
+
+  <!-- ══════════════ TAB BAR ══════════════ -->
+  <div style="position:absolute; left:0; right:0; bottom:0; height:86px; background:rgba(11,12,14,.82); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-top:1px solid rgba(255,255,255,.07); display:flex; padding:8px 8px 22px; z-index:30;">
+    <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+      <button onClick="{{ t.onClick }}" style="flex:1; border:none; background:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px; padding-top:8px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="{{ t.d }}" stroke="{{ t.color }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span style="font-size:10px; font-weight:600; color:{{ t.color }};">{{ t.label }}</span>
+      </button>
+    </sc-for>
+  </div>
+
+  <!-- ══════════════ EXERCISE DETAIL SHEET ══════════════ -->
+  <sc-if value="{{ detailOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; inset:0; z-index:60; animation:fadeIn .2s ease;">
+    <div onClick="{{ closeDetail }}" style="position:absolute; inset:0; background:rgba(0,0,0,.55);"></div>
+    <div style="position:absolute; left:0; right:0; bottom:0; max-height:88%; background:#121317; border-radius:26px 26px 0 0; border-top:1px solid rgba(255,255,255,.1); overflow-y:auto; animation:sheetUp .32s cubic-bezier(.16,1,.3,1); transform:translateY({{ detailY }}px);">
+      <div style="position:sticky; top:0; background:#121317; padding:14px 20px 12px; z-index:2;">
+        <div onPointerDown="{{ detailDrag.down }}" onPointerMove="{{ detailDrag.move }}" onPointerUp="{{ detailDrag.up }}" style="touch-action:none; cursor:grab; margin:-6px -20px 8px; padding:6px 0 10px; display:flex; justify-content:center;">
+          <div style="width:38px; height:5px; border-radius:99px; background:rgba(255,255,255,.2);"></div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:12px;">
+          <div style="flex:1;">
+            <span style="display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px; padding:3px 9px; border-radius:6px; background:{{ ex.catColor }}22; color:{{ ex.catColor }}; text-transform:uppercase;">{{ ex.cat }}</span>
+            <div style="font-family:'Anton',sans-serif; font-size:27px; line-height:1.05; margin-top:9px; text-transform:uppercase;">{{ ex.name }}</div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#8B9096; margin-top:7px;">Equipo · {{ ex.equip }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:14px 20px 0; display:flex; gap:9px;">
+        <div style="flex:1; text-align:center; background:#1A1C21; border-radius:13px; padding:12px 6px;"><div style="font-family:'JetBrains Mono',monospace; font-size:17px; font-weight:700; color:#F3F1EC;">{{ ex.setsN }}</div><div style="font-size:9px; letter-spacing:1px; color:#8B9096; text-transform:uppercase; margin-top:3px;">Series</div></div>
+        <div style="flex:1; text-align:center; background:#1A1C21; border-radius:13px; padding:12px 6px;"><div style="font-family:'JetBrains Mono',monospace; font-size:17px; font-weight:700; color:#F3F1EC;">{{ ex.repsN }}</div><div style="font-size:9px; letter-spacing:1px; color:#8B9096; text-transform:uppercase; margin-top:3px;">Reps</div></div>
+        <div style="flex:1; text-align:center; background:#1A1C21; border-radius:13px; padding:12px 6px;"><div style="font-family:'JetBrains Mono',monospace; font-size:17px; font-weight:700; color:#F3F1EC;">{{ ex.restLabel }}</div><div style="font-size:9px; letter-spacing:1px; color:#8B9096; text-transform:uppercase; margin-top:3px;">Descanso</div></div>
+      </div>
+
+      <div style="padding:20px;">
+        <div style="border-radius:14px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); padding:14px 16px;">
+          <div style="font-size:11px; letter-spacing:1.5px; color:{{ ex.catColor }}; text-transform:uppercase; font-weight:700;">Por qué para JiuJitsu</div>
+          <div style="font-size:14px; line-height:1.55; color:#D7D5D0; margin-top:8px;">{{ ex.why }}</div>
+        </div>
+
+        <div style="font-size:11px; letter-spacing:1.5px; color:#8B9096; text-transform:uppercase; margin:22px 2px 12px;">Ejecución</div>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <sc-for list="{{ ex.cues }}" as="c" hint-placeholder-count="3">
+            <div style="display:flex; gap:12px; align-items:flex-start;">
+              <span style="width:24px; height:24px; flex-shrink:0; border-radius:8px; background:{{ ex.catColor }}22; color:{{ ex.catColor }}; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;">{{ c.n }}</span>
+              <span style="font-size:14px; line-height:1.5; color:#D7D5D0;">{{ c.text }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="margin-top:18px; display:flex; flex-wrap:wrap; gap:7px;">
+          <sc-for list="{{ ex.muscles }}" as="m" hint-placeholder-count="3">
+            <span style="font-size:11px; padding:5px 11px; border-radius:999px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); color:#A9ADB3;">{{ m }}</span>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ ex.canSwap }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ ex.onSwap }}" style="width:100%; margin-top:22px; border:1px dashed rgba(255,255,255,.2); background:rgba(255,255,255,.03); color:#E8E6E1; cursor:pointer; padding:15px; border-radius:14px; font-family:'Archivo',sans-serif; font-size:14px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:9px;"><span style="font-size:17px;">⇄</span> Cambiar · equipo ocupado</button>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ══════════════ ACTIVE SESSION ══════════════ -->
+  <sc-if value="{{ sessionActive }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; inset:0; z-index:70; background:#0B0C0E; display:flex; flex-direction:column; animation:fadeIn .25s ease;">
+    <!-- header -->
+    <div style="padding:24px 20px 14px; flex-shrink:0;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button onClick="{{ sess.onEnd }}" style="width:40px; height:40px; border-radius:50%; border:1px solid rgba(255,255,255,.12); background:#15171B; color:#C9CDD3; cursor:pointer; font-size:16px; flex-shrink:0;">✕</button>
+        <div style="flex:1;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1.5px; color:{{ sess.accent }}; text-transform:uppercase;">{{ sess.dayName }} · {{ sess.focus }}</div>
+          <div style="font-size:12px; color:#8B9096; margin-top:2px;">Ejercicio {{ sess.pos }} de {{ sess.total }} · {{ sess.clock }}</div>
+        </div>
+      </div>
+      <div style="height:5px; border-radius:99px; background:rgba(255,255,255,.08); margin-top:14px; overflow:hidden;">
+        <div style="height:100%; border-radius:99px; background:{{ sess.accent }}; width:{{ sess.progressPct }}; transition:width .3s ease;"></div>
+      </div>
+    </div>
+
+    <div style="flex:1; overflow-y:auto; padding:0 20px;">
+      <div style="border-radius:20px; background:linear-gradient(160deg,#1D2026,#141519); border:1px solid rgba(255,255,255,.08); padding:22px 20px; margin-top:6px;">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
+          <div style="flex:1;">
+            <span style="display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px; padding:3px 9px; border-radius:6px; background:{{ sess.exCatColor }}22; color:{{ sess.exCatColor }}; text-transform:uppercase;">{{ sess.exCat }}</span>
+            <div style="font-family:'Anton',sans-serif; font-size:28px; line-height:1.02; margin-top:9px; text-transform:uppercase;">{{ sess.exName }}</div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:13px; color:#8B9096; margin-top:6px;">Objetivo · {{ sess.exTarget }} · {{ sess.exEquip }}</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px; flex-shrink:0;">
+            <button onClick="{{ sess.onInfo }}" title="Detalle" style="width:40px; height:40px; border-radius:50%; border:1px solid rgba(255,255,255,.14); background:#15171B; color:#C9CDD3; cursor:pointer; font-size:14px;">ⓘ</button>
+            <button onClick="{{ sess.onSwap }}" title="Cambiar" style="width:40px; height:40px; border-radius:50%; border:1px solid rgba(255,255,255,.14); background:#15171B; color:#C9CDD3; cursor:pointer; font-size:16px;">⇄</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- interval timer (cardio) -->
+      <sc-if value="{{ sess.isTimer }}" hint-placeholder-val="{{ false }}">
+      <div style="border-radius:20px; background:#15171B; border:1px solid rgba(255,255,255,.08); padding:24px 20px; margin-top:14px; text-align:center;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:2px; color:{{ sess.t.phaseColor }}; text-transform:uppercase;">{{ sess.t.phase }}</div>
+        <div style="font-family:'Anton',sans-serif; font-size:64px; line-height:1; margin-top:8px; color:#F3F1EC;">{{ sess.t.time }}</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#8B9096; margin-top:8px;">Ronda {{ sess.t.round }} / {{ sess.t.rounds }}</div>
+        <div style="height:6px; border-radius:99px; background:rgba(255,255,255,.08); margin-top:16px; overflow:hidden;">
+          <div style="height:100%; border-radius:99px; background:{{ sess.t.phaseColor }}; width:{{ sess.t.pct }}; transition:width 1s linear;"></div>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:18px;">
+          <button onClick="{{ sess.t.onToggle }}" style="flex:2; border:none; cursor:pointer; padding:14px; border-radius:13px; background:{{ sess.t.btnBg }}; color:{{ sess.t.btnColor }}; font-family:'Anton',sans-serif; font-size:16px; letter-spacing:1px; text-transform:uppercase;">{{ sess.t.btnLabel }}</button>
+          <button onClick="{{ sess.t.onReset }}" style="flex:1; border:1px solid rgba(255,255,255,.14); cursor:pointer; padding:14px; border-radius:13px; background:transparent; color:#C9CDD3; font-family:'Archivo',sans-serif; font-size:13px; font-weight:600;">Reiniciar</button>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- simple done (mobility) -->
+      <sc-if value="{{ sess.isSimple }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ sess.onSimpleDone }}" style="width:100%; margin-top:14px; border:1px solid {{ sess.simpleBorder }}; background:{{ sess.simpleBg }}; color:{{ sess.simpleColor }}; cursor:pointer; padding:20px; border-radius:16px; font-family:'Anton',sans-serif; font-size:16px; letter-spacing:1px; text-transform:uppercase;">{{ sess.simpleLabel }}</button>
+      </sc-if>
+
+      <!-- set rows (strength) -->
+      <sc-if value="{{ sess.isSets }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+        <div style="display:flex; align-items:center; gap:6px; padding:0 8px; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px; color:#7A8087; text-transform:uppercase;">
+          <span style="width:28px;">Serie</span>
+          <span style="flex:1; text-align:center;">Peso ({{ unit }})</span>
+          <span style="flex:1; text-align:center;">Reps</span>
+          <span style="width:46px;"></span>
+        </div>
+        <sc-for list="{{ sess.sets }}" as="s" hint-placeholder-count="4">
+          <div style="display:flex; align-items:center; gap:6px; border-radius:14px; background:{{ s.rowBg }}; border:1px solid {{ s.rowBorder }}; padding:8px;">
+            <span style="width:28px; text-align:center; font-family:'Anton',sans-serif; font-size:18px; color:{{ s.numColor }};">{{ s.n }}</span>
+            <div style="flex:1; display:flex; align-items:center; justify-content:center; gap:4px;">
+              <button onClick="{{ s.onWMinus }}" style="width:36px; height:40px; border-radius:9px; border:none; background:rgba(255,255,255,.06); color:#C9CDD3; cursor:pointer; font-size:17px;">–</button>
+              <input type="number" inputMode="decimal" value="{{ s.weight }}" onInput="{{ s.onWSet }}" style="width:46px; text-align:center; background:transparent; border:none; outline:none; color:#F3F1EC; font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:700;" />
+              <button onClick="{{ s.onWPlus }}" style="width:36px; height:40px; border-radius:9px; border:none; background:rgba(255,255,255,.06); color:#C9CDD3; cursor:pointer; font-size:17px;">+</button>
+            </div>
+            <div style="flex:1; display:flex; align-items:center; justify-content:center; gap:4px;">
+              <button onClick="{{ s.onRMinus }}" style="width:36px; height:40px; border-radius:9px; border:none; background:rgba(255,255,255,.06); color:#C9CDD3; cursor:pointer; font-size:17px;">–</button>
+              <span style="min-width:24px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:700; color:#F3F1EC;">{{ s.reps }}</span>
+              <button onClick="{{ s.onRPlus }}" style="width:36px; height:40px; border-radius:9px; border:none; background:rgba(255,255,255,.06); color:#C9CDD3; cursor:pointer; font-size:17px;">+</button>
+            </div>
+            <button onClick="{{ s.onCheck }}" style="width:46px; height:44px; border-radius:11px; border:none; cursor:pointer; background:{{ s.checkBg }}; color:{{ s.checkColor }}; font-size:17px; font-weight:700;">✓</button>
+          </div>
+        </sc-for>
+      </div>
+      </sc-if>
+
+      <div style="height:120px;"></div>
+    </div>
+
+    <!-- rest timer / next -->
+    <div style="flex-shrink:0; padding:14px 20px 30px; background:linear-gradient(0deg,#0B0C0E 60%,transparent); position:relative;">
+      <sc-if value="{{ sess.restActive }}" hint-placeholder-val="{{ false }}">
+      <div style="border-radius:16px; background:#15171B; border:1px solid rgba(255,255,255,.08); padding:14px 16px; margin-bottom:10px; animation:popIn .2s ease;">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1.5px; color:#8B9096; text-transform:uppercase;">Descanso</span>
+          <span style="font-family:'Anton',sans-serif; font-size:24px; color:{{ A }};">{{ sess.restLabel }}</span>
+          <button onClick="{{ sess.onSkipRest }}" style="border:none; background:rgba(255,255,255,.06); color:#C9CDD3; cursor:pointer; font-size:12px; padding:10px 14px; border-radius:9px;">Saltar</button>
+        </div>
+        <div style="height:5px; border-radius:99px; background:rgba(255,255,255,.08); margin-top:10px; overflow:hidden;">
+          <div style="height:100%; border-radius:99px; background:{{ A }}; width:{{ sess.restPct }}; transition:width 1s linear;"></div>
+        </div>
+      </div>
+      </sc-if>
+      <div style="display:flex; gap:10px;">
+        <button onClick="{{ sess.onPrev }}" title="Ejercicio anterior" style="width:58px; flex-shrink:0; border:1px solid rgba(255,255,255,.14); cursor:pointer; padding:16px 0; border-radius:14px; background:#15171B; color:{{ sess.prevColor }}; font-size:18px;">◂</button>
+        <button onClick="{{ sess.onAdvance }}" style="flex:1; border:none; cursor:pointer; padding:16px; border-radius:14px; background:{{ sess.btnBg }}; color:{{ sess.btnColor }}; font-family:'Anton',sans-serif; font-size:18px; letter-spacing:1px; text-transform:uppercase;">{{ sess.btnLabel }}</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ══════════════ SESSION SUMMARY ══════════════ -->
+  <sc-if value="{{ sumOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; inset:0; z-index:90; animation:fadeIn .2s ease;">
+    <div style="position:absolute; inset:0; background:rgba(0,0,0,.65);"></div>
+    <div style="position:absolute; left:0; right:0; bottom:0; background:#121317; border-radius:26px 26px 0 0; border-top:1px solid rgba(255,255,255,.1); animation:sheetUp .32s cubic-bezier(.16,1,.3,1);">
+      <div style="padding:18px 20px 30px;">
+        <div style="width:38px; height:5px; border-radius:99px; background:rgba(255,255,255,.2); margin:0 auto 16px;"></div>
+        <div style="text-align:center;">
+          <div style="font-size:34px;">🥋</div>
+          <div style="font-family:'Anton',sans-serif; font-size:28px; text-transform:uppercase; margin-top:8px;">Entreno completado</div>
+          <div style="font-size:13px; color:#8B9096; margin-top:4px;">{{ sum.dayName }} · {{ sum.focus }}</div>
+        </div>
+        <div style="display:flex; gap:9px; margin-top:20px;">
+          <div style="flex:1; text-align:center; background:#1A1C21; border-radius:13px; padding:14px 6px;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700; color:{{ A }};">{{ sum.duration }}</div><div style="font-size:9px; letter-spacing:1px; color:#8B9096; text-transform:uppercase; margin-top:3px;">Minutos</div></div>
+          <div style="flex:1; text-align:center; background:#1A1C21; border-radius:13px; padding:14px 6px;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700; color:{{ A }};">{{ sum.volume }}</div><div style="font-size:9px; letter-spacing:1px; color:#8B9096; text-transform:uppercase; margin-top:3px;">Kg volumen</div></div>
+          <div style="flex:1; text-align:center; background:#1A1C21; border-radius:13px; padding:14px 6px;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700; color:{{ A }};">{{ sum.sets }}</div><div style="font-size:9px; letter-spacing:1px; color:#8B9096; text-transform:uppercase; margin-top:3px;">Series ✓</div></div>
+        </div>
+        <sc-if value="{{ sum.hasPrs }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:14px; border-radius:14px; background:rgba(234,179,8,.07); border:1px solid rgba(234,179,8,.25); padding:13px 16px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1.5px; color:#EAB308; text-transform:uppercase;">Nuevos récords</div>
+          <sc-for list="{{ sum.prs }}" as="p" hint-placeholder-count="2">
+            <div style="display:flex; align-items:center; gap:10px; margin-top:8px;">
+              <span style="font-size:14px;">🏆</span>
+              <span style="flex:1; font-size:13px; font-weight:600; color:#E8E6E1;">{{ p.lift }}</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:#EAB308;">{{ p.val }}</span>
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+        <button onClick="{{ sum.onSave }}" style="width:100%; margin-top:18px; border:none; cursor:pointer; padding:16px; border-radius:14px; background:{{ A }}; color:#0B0C0E; font-family:'Anton',sans-serif; font-size:17px; letter-spacing:1px; text-transform:uppercase;">Guardar entreno ✓</button>
+        <button onClick="{{ sum.onDiscard }}" style="width:100%; margin-top:10px; border:1px solid rgba(255,255,255,.12); cursor:pointer; padding:13px; border-radius:14px; background:transparent; color:#8B9096; font-family:'Archivo',sans-serif; font-size:13px; font-weight:600;">Descartar</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ══════════════ SWAP PICKER ══════════════ -->
+  <sc-if value="{{ swapOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; inset:0; z-index:80; animation:fadeIn .2s ease;">
+    <div onClick="{{ closeSwap }}" style="position:absolute; inset:0; background:rgba(0,0,0,.6);"></div>
+    <div style="position:absolute; left:0; right:0; bottom:0; max-height:82%; background:#121317; border-radius:26px 26px 0 0; border-top:1px solid rgba(255,255,255,.1); overflow-y:auto; animation:sheetUp .32s cubic-bezier(.16,1,.3,1); transform:translateY({{ swapY }}px);">
+      <div style="padding:14px 20px 8px;">
+        <div onPointerDown="{{ swapDrag.down }}" onPointerMove="{{ swapDrag.move }}" onPointerUp="{{ swapDrag.up }}" style="touch-action:none; cursor:grab; margin:-6px -20px 8px; padding:6px 0 10px; display:flex; justify-content:center;">
+          <div style="width:38px; height:5px; border-radius:99px; background:rgba(255,255,255,.2);"></div>
+        </div>
+        <div style="font-family:'Anton',sans-serif; font-size:24px; text-transform:uppercase;">Cambiar ejercicio</div>
+        <div style="font-size:12px; color:#8B9096; margin-top:5px; line-height:1.45;">Alternativas con las mismas cualidades que <span style="color:#E8E6E1;">{{ swapTitle }}</span>. Útil si un aparato está ocupado.</div>
+      </div>
+      <div style="padding:10px 20px 30px; display:flex; flex-direction:column; gap:9px;">
+        <sc-for list="{{ swapList }}" as="o" hint-placeholder-count="3">
+          <button onClick="{{ o.onPick }}" style="border:1px solid {{ o.border }}; background:{{ o.bg }}; cursor:pointer; text-align:left; border-radius:14px; padding:13px 15px; display:flex; align-items:center; gap:12px;">
+            <span style="width:8px; height:8px; border-radius:50%; background:{{ o.catColor }}; flex-shrink:0;"></span>
+            <span style="flex:1; min-width:0;">
+              <span style="display:block; font-size:15px; font-weight:600; color:#F3F1EC;">{{ o.name }}</span>
+              <span style="display:block; font-size:11px; color:#8B9096; margin-top:2px;">{{ o.equip }} · {{ o.reps }}</span>
+            </span>
+            <span style="font-size:10px; font-family:'JetBrains Mono',monospace; letter-spacing:.5px; color:{{ o.tagColor }};">{{ o.tag }}</span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:420,&quot;height&quot;:860},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#3B82F6&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#FF4A1C&quot;,&quot;#EAB308&quot;,&quot;#22C55E&quot;,&quot;#3B82F6&quot;,&quot;#A855F7&quot;]},&quot;athleteName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Nefta&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;unit&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;kg&quot;,&quot;options&quot;:[&quot;kg&quot;,&quot;lb&quot;],&quot;tsType&quot;:&quot;string&quot;},&quot;autoRest&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { tab:'hoy', ex:null, slot:null, detailOpen:false, sourceOpen:false,
+            swapOpen:false, swapSlot:null, swaps:{},
+            session:null, rest:0, restTotal:0, itimer:null,
+            sumOpen:false, sum:null, sheetY:0, nowMin:0,
+            q:'', libCat:'Todos', dataTick:0 };
+
+  store = { lastWeights:{}, history:[] };
+  STORAGE_KEY = 'bjj-rutina-v1';
+
+  CATS = {
+    'Tracción':{c:'#3B82F6', ab:'TR'}, 'Empuje':{c:'#F97316', ab:'EM'}, 'Pierna':{c:'#A855F7', ab:'PN'},
+    'Potencia':{c:'#FF4A1C', ab:'PW'}, 'Core':{c:'#22C55E', ab:'CR'}, 'Agarre':{c:'#EAB308', ab:'AG'},
+    'Movilidad':{c:'#22D3EE', ab:'MV'}, 'Cardio':{c:'#F43F5E', ab:'CD'} };
+
+  LIB = [
+    {id:'mob_t', name:'Movilidad torácica y cadera', cat:'Movilidad', pattern:'mobility', equip:'Sin equipo', sets:1, reps:'5 min', rest:0, wt:0, defReps:8,
+      why:'Un torso y caderas móviles te dejan empaquetar la espalda y abrir la guardia sin comprometer los hombros bajo presión.',
+      cues:['Rotaciones de columna torácica en cuadrupedia, 8 por lado.','Dislocaciones de hombro con banda, rango completo.','Círculos de cadera 90/90 para abrir la guardia.'],
+      muscles:['Columna torácica','Hombros','Cadera']},
+
+    {id:'deadlift', name:'Peso muerto (barra)', cat:'Pierna', pattern:'hinge', equip:'Barra', sets:3, reps:'5', rest:150, wt:100, defReps:5,
+      why:'El ejercicio con mayor transferencia a BJJ: cadena posterior + agarre + drive de cadera para derribos, sprawls y levantar al rival.',
+      cues:['Barra pegada a las espinillas, columna neutra.','Empuja el suelo con los pies; cadera y hombros suben juntos.','Bloquea glúteos arriba; baja controlado sin redondear.'],
+      muscles:['Glúteos','Isquios','Espalda baja','Agarre']},
+    {id:'rdl', name:'Peso muerto rumano (mancuernas)', cat:'Pierna', pattern:'hinge', equip:'Mancuernas', sets:3, reps:'8', rest:120, wt:30, defReps:8,
+      why:'La cadena posterior potente protege la espalda baja y da el explosivo para pasar la guardia y hacer sweeps.',
+      cues:['Bisagra de cadera, rodillas suaves.','Mancuernas pegadas a las piernas, columna neutra.','Estira isquios y empuja la cadera al frente.'],
+      muscles:['Isquios','Glúteos','Erectores']},
+    {id:'hipthrust', name:'Empuje de cadera (hip thrust)', cat:'Pierna', pattern:'hinge', equip:'Barra + banco', sets:3, reps:'10', rest:90, wt:60, defReps:10,
+      why:'Máxima activación del glúteo: potencia de extensión de cadera para el puente (bridge) y escapar de posiciones dominadas.',
+      cues:['Escápulas sobre el banco, barbilla metida.','Empuja con los talones, bloquea glúteos arriba.','Pausa 1 s en la contracción; sin arquear la lumbar.'],
+      muscles:['Glúteos','Isquios','Core']},
+
+    {id:'squat', name:'Sentadilla con barra', cat:'Pierna', pattern:'squat', equip:'Barra / Smith', sets:4, reps:'5', rest:150, wt:100, defReps:5,
+      why:'La base de fuerza para levantar, derribar y sostener posición; piernas fuertes = presión aplastante desde arriba.',
+      cues:['Barra alta, pies a la anchura de hombros.','Rompe por cadera y rodilla a la vez, pecho arriba.','Profundidad al paralelo o más, sin colapsar rodillas.'],
+      muscles:['Cuádriceps','Glúteos','Core']},
+    {id:'goblet', name:'Sentadilla goblet', cat:'Pierna', pattern:'squat', equip:'Mancuerna', sets:3, reps:'10', rest:90, wt:28, defReps:10,
+      why:'Fuerza de piernas con torso vertical y core activo, más amable con la espalda cuando ya acumulas fatiga del tatami.',
+      cues:['Mancuerna al pecho, codos dentro.','Siéntate entre las rodillas, talones firmes.','Sube empujando el suelo, glúteos bloqueados.'],
+      muscles:['Cuádriceps','Glúteos','Core']},
+    {id:'legs_m', name:'Extensión y femoral (máquina)', cat:'Pierna', pattern:'legiso', equip:'Máquina', sets:3, reps:'12', rest:60, wt:40, defReps:12,
+      why:'Refuerza rodilla y equilibrio cuádriceps/isquios para prevenir las lesiones típicas de la guardia y los leglocks.',
+      cues:['Rango completo, contracción controlada.','Sin balancear la carga; 2 s en la bajada.','Iguala el volumen de extensión y flexión.'],
+      muscles:['Cuádriceps','Isquios','Rodilla']},
+
+    {id:'pullup', name:'Dominadas', cat:'Tracción', pattern:'vpull', equip:'Barra dominadas', sets:4, reps:'6–8', rest:120, wt:0, defReps:7,
+      why:'El jaleo desde la guardia y el control de las mangas dependen de una tracción vertical potente: patrón nº1 para BJJ.',
+      cues:['Agarre prono a la anchura de hombros, o toalla para más agarre.','Escápulas hacia abajo antes de tirar; pecho a la barra.','Bajada controlada de 2–3 s, sin balanceo.'],
+      muscles:['Dorsal ancho','Bíceps','Agarre']},
+    {id:'latpull', name:'Jalón al pecho (polea alta)', cat:'Tracción', pattern:'vpull', equip:'Polea alta', sets:3, reps:'10–12', rest:90, wt:55, defReps:11,
+      why:'Añade volumen de tracción sin fatigar tanto el agarre; ideal para acumular trabajo de espalda entre clases de sparring.',
+      cues:['Barra ligeramente ancha, pecho arriba.','Lleva los codos al bolsillo, no tires con las manos.','Pausa 1 s en la contracción máxima.'],
+      muscles:['Dorsal ancho','Romboides','Bíceps']},
+
+    {id:'row', name:'Remo con barra', cat:'Tracción', pattern:'hpull', equip:'Barra', sets:4, reps:'8', rest:120, wt:60, defReps:8,
+      why:'La tracción horizontal replica acercar al oponente y refuerza la espalda alta para explotar fuera de malas posiciones.',
+      cues:['Bisagra de cadera ~45°, columna neutra.','Tira hacia el ombligo, aprieta las escápulas.','Sin tirones: el core estable manda.'],
+      muscles:['Espalda media','Dorsal','Erectores']},
+    {id:'dbrow', name:'Remo con mancuerna', cat:'Tracción', pattern:'hpull', equip:'Mancuerna + banco', sets:3, reps:'10', rest:75, wt:32, defReps:10,
+      why:'Tracción unilateral que corrige asimetrías y mantiene la espalda fuerte con menos carga sobre la lumbar.',
+      cues:['Apoya rodilla y mano en el banco, espalda plana.','Tira el codo hacia la cadera, sin rotar el torso.','Estira abajo controlado, sin encoger el hombro.'],
+      muscles:['Dorsal','Espalda media','Bíceps']},
+    {id:'cablerow', name:'Remo en polea baja', cat:'Tracción', pattern:'hpull', equip:'Polea baja', sets:3, reps:'12', rest:75, wt:50, defReps:12,
+      why:'Tensión constante para la espalda con articulaciones amables; buen sustituto cuando la barra está ocupada.',
+      cues:['Pecho arriba, tira desde los codos.','Aprieta las escápulas 1 s.','Vuelve estirando sin redondear la espalda.'],
+      muscles:['Espalda media','Dorsal','Romboides']},
+
+    {id:'facepull', name:'Face pull (polea)', cat:'Tracción', pattern:'prehab', equip:'Polea', sets:3, reps:'15', rest:60, wt:25, defReps:15,
+      why:'Salud del hombro: equilibra el empuje del sparring y previene lesiones del manguito rotador comunes en grappling.',
+      cues:['Cuerda a la altura de la cara, codos altos.','Rota externamente al final del recorrido.','Ritmo lento, sin usar impulso.'],
+      muscles:['Deltoides posterior','Manguito rotador','Trapecio']},
+    {id:'bandpull', name:'Band pull-apart', cat:'Tracción', pattern:'prehab', equip:'Banda', sets:3, reps:'20', rest:45, wt:0, defReps:20,
+      why:'Prehab de hombro sin carga axial; ideal para calentar la espalda alta o rematar sin fatigar el agarre.',
+      cues:['Banda al frente a la altura del pecho.','Abre los brazos juntando escápulas.','Controla la vuelta, sin encoger los hombros.'],
+      muscles:['Deltoides posterior','Romboides','Trapecio']},
+
+    {id:'bench', name:'Press de banca con mancuernas', cat:'Empuje', pattern:'hpush', equip:'Mancuernas + banco', sets:4, reps:'8', rest:120, wt:30, defReps:8,
+      why:'Empuje horizontal para crear marco y espacio, esencial para escapar de posiciones dominadas y montar defensa.',
+      cues:['Escápulas retraídas, pies firmes.','Baja controlado a los lados del pecho.','Mancuernas dan más rango y estabilidad de hombro que la barra.'],
+      muscles:['Pectoral','Tríceps','Deltoides']},
+    {id:'pushup', name:'Flexiones (lastradas)', cat:'Empuje', pattern:'hpush', equip:'Peso corporal', sets:3, reps:'12–15', rest:60, wt:0, defReps:12,
+      why:'Empuje con core integrado que imita el framing; siempre disponible cuando los bancos están ocupados.',
+      cues:['Cuerpo en tabla rígida, glúteos apretados.','Codos ~45°, baja el pecho al suelo.','Añade disco o chaleco para progresar.'],
+      muscles:['Pectoral','Tríceps','Core']},
+    {id:'peck', name:'Peck deck', cat:'Empuje', pattern:'hpush', equip:'Peck deck', sets:3, reps:'12', rest:60, wt:45, defReps:12,
+      why:'Aísla el pectoral para acumular volumen de empuje sin recargar los codos ni la muñeca fatigados del grappling.',
+      cues:['Codos ligeramente flexionados, arco constante.','Aprieta el pecho 1 s en el centro.','Vuelta lenta, sin soltar la tensión.'],
+      muscles:['Pectoral','Deltoides anterior']},
+
+    {id:'ohp', name:'Press militar', cat:'Empuje', pattern:'vpush', equip:'Barra', sets:3, reps:'8–10', rest:90, wt:40, defReps:9,
+      why:'Fuerza por encima de la cabeza para framing y estabilidad de hombro cuando controlas al oponente desde arriba.',
+      cues:['Core apretado, sin arquear la lumbar.','Empuje vertical, cabeza a través al final.','Controla la bajada hasta la barbilla.'],
+      muscles:['Deltoides','Tríceps','Core']},
+    {id:'dbpush', name:'Press de hombro con mancuernas', cat:'Empuje', pattern:'vpush', equip:'Mancuernas', sets:3, reps:'10', rest:75, wt:20, defReps:10,
+      why:'Empuje vertical con más libertad de hombro; buena alternativa a la barra para hombros exigidos por el gi.',
+      cues:['Sentado o de pie, core firme.','Empuja hasta extender sin bloquear brusco.','Baja controlado a la altura de las orejas.'],
+      muscles:['Deltoides','Tríceps']},
+
+    {id:'farmer', name:"Farmer's carry", cat:'Agarre', pattern:'grip', equip:'Mancuernas', sets:4, reps:'40 m', rest:90, wt:40, defReps:1,
+      why:'El agarre que no cede gana los agarres de gi y los estrangulamientos; los paseos cargados construyen ese grip bajo fatiga.',
+      cues:['Mancuerna pesada en cada mano, hombros abajo.','Core apretado, pasos cortos y firmes.','Camina 40 m sin soltar; aumenta peso, no distancia.'],
+      muscles:['Agarre','Trapecio','Core']},
+    {id:'wrist', name:'Curl de muñeca + Dead hang', cat:'Agarre', pattern:'grip', equip:'Barra Z', sets:3, reps:'15 + máx.', rest:60, wt:20, defReps:15,
+      why:'Fortalece flexores del antebrazo y resistencia isométrica: la moneda del BJJ cuando peleas por el agarre de la solapa.',
+      cues:['Curl de muñeca con barra Z, rango completo.','Termina con dead hang colgado a fallo controlado.','Registra el tiempo de colgado como métrica de agarre.'],
+      muscles:['Antebrazos','Flexores','Agarre']},
+
+    {id:'swing', name:'Swing con mancuerna', cat:'Potencia', pattern:'power', equip:'Mancuerna', sets:4, reps:'12', rest:75, wt:24, defReps:12,
+      why:'Bisagra explosiva repetida: construye el motor de cadera y el gas tank para aguantar rondas intensas.',
+      cues:['Bisagra dura, la mancuerna cae entre las piernas.','Empuje de cadera explosivo, no un levantamiento de brazos.','Core y glúteos bloquean arriba; ritmo continuo.'],
+      muscles:['Glúteos','Isquios','Core']},
+    {id:'boxjump', name:'Salto al cajón', cat:'Potencia', pattern:'power', equip:'Cajón', sets:4, reps:'4', rest:120, wt:0, defReps:4,
+      why:'La potencia explosiva de cadera es lo que separa un sweep lento de uno que manda al rival al suelo.',
+      cues:['Cajón a altura segura, brazos activos.','Salto explosivo, aterrizaje suave y estable.','Baja caminando; cada rep máxima intención, no fatiga.'],
+      muscles:['Glúteos','Cuádriceps','Sistema nervioso']},
+
+    {id:'mcgill', name:'McGill Big 3', cat:'Core', pattern:'core', equip:'Sin equipo', sets:3, reps:'rondas', rest:45, wt:0, defReps:5,
+      why:'Un core que resiste la extensión y rotación protege la columna y te mantiene rígido cuando intentan pasarte la guardia.',
+      cues:['Curl-up: una rodilla flexionada, manos bajo la lumbar.','Plancha lateral: cadera alta, línea recta.','Bird-dog: extiende brazo y pierna opuestos sin girar la cadera.'],
+      muscles:['Core anterior','Oblicuos','Erectores']},
+    {id:'pallof', name:'Pallof press (anti-rotación)', cat:'Core', pattern:'core', equip:'Polea', sets:3, reps:'10/lado', rest:45, wt:25, defReps:10,
+      why:'La anti-rotación es exactamente lo que haces al defender un pase o mantener la base: core que no cede al giro.',
+      cues:['De pie perpendicular a la polea, tensión constante.','Extiende los brazos resistiendo la rotación.','Sin mover cadera ni hombros; el core hace el trabajo.'],
+      muscles:['Oblicuos','Core anterior','Estabilizadores']},
+    {id:'hlr', name:'Elevación de piernas colgado', cat:'Core', pattern:'core', equip:'Barra dominadas', sets:3, reps:'10–12', rest:45, wt:0, defReps:10,
+      why:'Flexión de cadera y anti-balanceo que fortalece el core inferior y, de paso, el agarre por colgarte de la barra.',
+      cues:['Cuélgate sin balancear, hombros activos.','Sube piernas rectas o rodillas al pecho con control.','Baja lento, sin usar impulso.'],
+      muscles:['Core inferior','Flexores de cadera','Agarre']},
+
+    {id:'bike', name:'Intervalos en bicicleta', cat:'Cardio', pattern:'cardio', equip:'Bicicleta', sets:1, reps:'6 × 20/40 s', rest:0, wt:0, defReps:6, timer:{work:20, rest:40, rounds:6},
+      why:'El gas tank decide los últimos minutos del combate: los intervalos elevan la capacidad anaeróbica específica del BJJ.',
+      cues:['20 s a máxima potencia / 40 s suave.','6 rondas; mantén la técnica de pedaleo.','Registra los watts o RPM medios como progreso.'],
+      muscles:['Sistema cardiovascular','Piernas']},
+    {id:'tread', name:'Caminadora en cuesta (intervalos)', cat:'Cardio', pattern:'cardio', equip:'Caminadora', sets:1, reps:'5 × 1 min', rest:0, wt:0, defReps:5, timer:{work:60, rest:60, rounds:5},
+      why:'Acondicionamiento de bajo impacto para recuperar entre clases sin castigar articulaciones ya exigidas por el sparring.',
+      cues:['Inclinación 8–12%, ritmo sostenido 1 min.','1 min de recuperación caminando.','5 rondas; sube la inclinación antes que la velocidad.'],
+      muscles:['Sistema cardiovascular','Piernas']},
+    {id:'z2', name:'Base aeróbica (Zona 2)', cat:'Cardio', pattern:'cardio', equip:'Bici / Caminadora', sets:1, reps:'12 min', rest:0, wt:0, defReps:12, timer:{work:720, rest:0, rounds:1},
+      why:'Construye el motor aeróbico que te deja recuperar entre explosiones y sostener el ritmo en rondas largas.',
+      cues:['Ritmo conversacional (podrías hablar), 60–70% FC máx.','Respira por la nariz; sin acelerar.','Úsalo también como calentamiento del acondicionamiento.'],
+      muscles:['Sistema cardiovascular','Corazón']},
+    {id:'lactate', name:'Intervalos de tolerancia al lactato', cat:'Cardio', pattern:'cardio', equip:'Bici / Remo / Assault', sets:1, reps:'6 × 40/80 s', rest:0, wt:0, defReps:6, timer:{work:40, rest:80, rounds:6},
+      why:'Te enseña a producir fuerza mientras el lactato quema, justo como en los últimos minutos de una lucha intensa.',
+      cues:['40 s a intensidad muy alta (RPE 9), sin fallo técnico.','80 s de recuperación activa suave.','6 rondas; corta si la potencia cae mucho.'],
+      muscles:['Sistema anaeróbico','Piernas','Corazón']} ];
+
+  DAYS = [
+    {id:'d1', num:'01', name:'Lunes', focus:'Full Body · Fuerza A', accent:'#3B82F6', dur:'60 min', items:['mob_t','deadlift','pullup','bench','farmer','mcgill','z2']},
+    {id:'d2', num:'02', name:'Miércoles', focus:'Full Body · Fuerza B', accent:'#A855F7', dur:'60 min', items:['mob_t','squat','row','ohp','swing','pallof','lactate']} ];
+
+  WEEK = [
+    {d:'LUN', type:'strength', dayId:'d1'},
+    {d:'MAR', type:'bjj'},
+    {d:'MIÉ', type:'strength', dayId:'d2'},
+    {d:'JUE', type:'bjj'},
+    {d:'VIE', type:'bjj'},
+    {d:'SÁB', type:'rest'},
+    {d:'DOM', type:'rest'} ];
+  DAYNAMES = ['LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO','DOMINGO'];
+
+  componentDidMount(){
+    try{ const raw=localStorage.getItem(this.STORAGE_KEY);
+      if(raw){ const d=JSON.parse(raw);
+        this.store.lastWeights = d.lastWeights||{};
+        this.store.history = d.history||[];
+        this.setState({ swaps: d.swaps||{} });
+      }
+    }catch(_){ }
+    this._t = setInterval(()=>{
+      this.setState(s=>{
+        const patch={};
+        if(s.rest>0 && s.session) patch.rest = s.rest-1;
+        if(s.session) patch.nowMin = Math.floor((Date.now()-s.session.startTs)/60000);
+        if(s.itimer && s.itimer.running && !s.itimer.done && s.session){
+          let t={...s.itimer}; t.remaining--;
+          if(t.remaining<=0){
+            const e=this.ex(this.state.swaps[t.slot]||t.slot); const cfg=e.timer;
+            if(t.phase==='work' && cfg.rest>0){ t.phase='rest'; t.remaining=cfg.rest; }
+            else if(t.round<cfg.rounds){ t.round++; t.phase='work'; t.remaining=cfg.work; }
+            else { t.done=true; t.running=false; t.remaining=0;
+              patch.session = {...s.session, logs:{...s.session.logs, [t.slot]: s.session.logs[t.slot].map(r=>({...r,done:true}))}};
+            }
+          }
+          patch.itimer=t;
+        }
+        return Object.keys(patch).length? patch : null;
+      });
+    }, 1000);
+  }
+  componentWillUnmount(){ clearInterval(this._t); }
+
+  save(){ try{ localStorage.setItem(this.STORAGE_KEY, JSON.stringify({ swaps:this.state.swaps, lastWeights:this.store.lastWeights, history:this.store.history })); }catch(_){ } }
+
+  ex(id){ return this.LIB.find(e=>e.id===id); }
+  effId(id){ return this.state.swaps[id] || id; }
+  effEx(id){ return this.ex(this.effId(id)); }
+  cat(name){ return (this.CATS[name]||{c:'#8B9096'}).c; }
+  ab(name){ return (this.CATS[name]||{ab:'··'}).ab; }
+  patCount(p){ return this.LIB.filter(x=>x.pattern===p).length; }
+  norm(s){ return (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(); }
+  restStr(sec){ if(!sec) return '—'; const m=Math.floor(sec/60), s=sec%60; return m? (s? m+':'+String(s).padStart(2,'0') : m+' min') : sec+' s'; }
+  mmss(sec){ const m=Math.floor(sec/60), s=sec%60; return m+':'+String(s).padStart(2,'0'); }
+  todayIdx(){ return (new Date().getDay()+6)%7; }
+  weekStartTs(){ const d=new Date(); const off=(d.getDay()+6)%7; d.setHours(0,0,0,0); d.setDate(d.getDate()-off); return d.getTime(); }
+  completedThisWeek(){ const ws=this.weekStartTs(); const set={}; this.store.history.forEach(h=>{ if(h.ts>=ws) set[h.dayId]=true; }); return set; }
+  bestPrev(exId){ let best=0; this.store.history.forEach(h=>{ const b=h.best&&h.best[exId]; if(b&&b.w>best) best=b.w; }); return best; }
+
+  openEx = (id, slot=null)=> this.setState({ ex:this.ex(id), slot, detailOpen:true });
+  closeDetail = ()=> this.setState({ detailOpen:false });
+
+  openSwap = (slot)=> this.setState({ swapOpen:true, swapSlot:slot });
+  closeSwap = ()=> this.setState({ swapOpen:false });
+  doSwap = (slot, newId)=>{
+    const swaps = {...this.state.swaps};
+    if(newId===slot) delete swaps[slot]; else swaps[slot]=newId;
+    const patch = { swaps, swapOpen:false };
+    if(this.state.detailOpen && this.state.slot===slot) patch.ex = this.ex(newId);
+    const st = this.state.session;
+    if(st && st.logs[slot]){ const ne=this.ex(newId);
+      patch.session = {...st, logs:{...st.logs, [slot]:Array.from({length:ne.sets},()=>({done:false, weight:(this.store.lastWeights[newId]??ne.wt), reps:ne.defReps}))}};
+      if(this.curSlot()===slot) patch.itimer = ne.timer? {slot, running:false, phase:'work', remaining:ne.timer.work, round:1, done:false} : null;
+    }
+    this.setState(patch, ()=>this.save());
+  };
+
+  initTimer(slot){ const e=this.effEx(slot);
+    return e.timer? {slot, running:false, phase:'work', remaining:e.timer.work, round:1, done:false} : null; }
+
+  startSession = (dayId)=>{
+    const day = this.DAYS.find(d=>d.id===dayId);
+    const logs = {};
+    day.items.forEach(slot=>{ const e=this.effEx(slot);
+      logs[slot]=Array.from({length:e.sets},()=>({done:false, weight:(this.store.lastWeights[this.effId(slot)]??e.wt), reps:e.defReps})); });
+    this.setState({ session:{dayId, idx:0, logs, startTs:Date.now()}, detailOpen:false, swapOpen:false, rest:0, restTotal:0, nowMin:0,
+      itimer:this.initTimer(day.items[0]) });
+  };
+  endSession = ()=> this.setState({ session:null, rest:0, restTotal:0, itimer:null, sumOpen:false, sum:null });
+
+  curSlot(){ const s=this.state.session; if(!s) return null; const day=this.DAYS.find(d=>d.id===s.dayId); return day.items[s.idx]; }
+
+  checkSet = (i)=>{ const st=this.state.session; const slot=this.curSlot();
+    const logs = {...st.logs, [slot]: st.logs[slot].map((r,j)=> j===i? {...r, done:!r.done} : r)};
+    const nowDone = logs[slot][i].done; const e = this.effEx(slot);
+    const patch = { session:{...st, logs} };
+    if(nowDone && this.props.autoRest!==false && e.rest>0){ patch.rest=e.rest; patch.restTotal=e.rest; }
+    this.setState(patch);
+  };
+  adj = (i, field, delta)=>{ const st=this.state.session; const slot=this.curSlot();
+    const logs = {...st.logs, [slot]: st.logs[slot].map((r,j)=> j===i? {...r,[field]:Math.max(0, Math.round((r[field]+delta)*10)/10)} : r)};
+    this.setState({session:{...st, logs}});
+  };
+  setW = (i, val)=>{ const st=this.state.session; const slot=this.curSlot();
+    const v = Math.max(0, parseFloat(val)||0);
+    const logs = {...st.logs, [slot]: st.logs[slot].map((r,j)=> j===i? {...r, weight:v} : r)};
+    this.setState({session:{...st, logs}});
+  };
+  skipRest = ()=> this.setState({rest:0});
+  goPrev = ()=>{ const st=this.state.session; if(!st || st.idx===0) return;
+    const day=this.DAYS.find(d=>d.id===st.dayId); const prevSlot=day.items[st.idx-1];
+    this.setState({session:{...st, idx:st.idx-1}, rest:0, itimer:this.initTimer(prevSlot)});
+  };
+  advance = ()=>{ const st=this.state.session; const day=this.DAYS.find(d=>d.id===st.dayId);
+    if(st.idx < day.items.length-1){
+      const nextSlot = day.items[st.idx+1];
+      this.setState({session:{...st, idx:st.idx+1}, rest:0, itimer:this.initTimer(nextSlot)});
+    } else this.openSummary();
+  };
+
+  openSummary(){
+    const st=this.state.session; if(!st) return;
+    const day=this.DAYS.find(d=>d.id===st.dayId);
+    let volume=0, sets=0; const best={}; const prs=[];
+    day.items.forEach(slot=>{ const e=this.effEx(slot); const id=this.effId(slot);
+      (st.logs[slot]||[]).forEach(r=>{ if(r.done){ sets++; volume += (r.weight||0)*(r.reps||0);
+        if(r.weight>0 && (!best[id] || r.weight>best[id].w)) best[id]={w:r.weight, r:r.reps, name:e.name}; } });
+    });
+    Object.keys(best).forEach(id=>{ if(best[id].w > this.bestPrev(id)) prs.push({lift:best[id].name, val:best[id].w+' kg × '+best[id].r}); });
+    const duration = Math.max(1, Math.round((Date.now()-st.startTs)/60000));
+    this.setState({ sumOpen:true, sum:{ dayId:st.dayId, dayName:day.name, focus:day.focus, duration, volume:Math.round(volume), sets, prs, best } });
+  }
+  saveSession = ()=>{
+    const s=this.state.sum; if(!s) return;
+    const bestClean={}; Object.keys(s.best).forEach(id=>{ bestClean[id]={w:s.best[id].w, r:s.best[id].r, name:s.best[id].name};
+      this.store.lastWeights[id]=s.best[id].w; });
+    this.store.history.push({ ts:Date.now(), dayId:s.dayId, dayName:s.dayName, focus:s.focus, volume:s.volume, setsDone:s.sets, best:bestClean });
+    this.save();
+    this.endSession();
+  };
+
+  makeDrag(kind){
+    return {
+      down:(e)=>{ this._dy0=e.clientY; this._dragKind=kind; try{ e.currentTarget.setPointerCapture(e.pointerId); }catch(_){ } },
+      move:(e)=>{ if(this._dy0==null || this._dragKind!==kind) return; this.setState({sheetY:Math.max(0, e.clientY-this._dy0)}); },
+      up:()=>{ if(this._dy0==null) return; const dy=this.state.sheetY; this._dy0=null;
+        if(dy>90){ kind==='detail'? this.closeDetail() : this.closeSwap(); }
+        this.setState({sheetY:0}); }
+    };
+  }
+
+  renderVals(){
+    const A = this.props.accent || '#FF4A1C';
+    const unit = this.props.unit || 'kg';
+    const tab = this.state.tab;
+    const setTab = (t)=>()=> this.setState({tab:t});
+    const hist = this.store.history;
+    const completed = this.completedThisWeek();
+    const tIdx = this.todayIdx();
+
+    // tabs
+    const T = [
+      {key:'hoy', label:'Hoy', d:'M4 8v8M8 6v12M16 6v12M20 8v8M8 12h8'},
+      {key:'semana', label:'Semana', d:'M7 3v3M17 3v3M4 8h16M5 5h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z'},
+      {key:'registro', label:'Progreso', d:'M3 3v18h18M7 14l4-4 3 3 5-6'},
+      {key:'biblioteca', label:'Biblioteca', d:'M4 6h16M4 12h16M4 18h10'} ];
+    const tabs = T.map(t=>({ ...t, color: tab===t.key? A : '#6B7076', onClick:setTab(t.key) }));
+
+    // real date label
+    const dstr = new Date().toLocaleDateString('es-ES',{weekday:'long', day:'numeric', month:'long'});
+    const todayLabel = dstr.charAt(0).toUpperCase()+dstr.slice(1);
+
+    // today / next plan day
+    let planIdx=tIdx, kicker='Entreno de hoy';
+    for(let k=0;k<7;k++){ const j=(tIdx+k)%7; if(this.WEEK[j].dayId){ planIdx=j; kicker = k===0? 'Entreno de hoy':'Próximo entreno'; break; } }
+    const dayObj = this.DAYS.find(d=>d.id===this.WEEK[planIdx].dayId);
+    const today = { name:dayObj.name, focus:dayObj.focus, accent:dayObj.accent, dur:dayObj.dur, count:dayObj.items.length, kicker,
+      preview: dayObj.items.slice(1,4).map((slot,i)=>{ const e=this.effEx(slot); return {n:String(i+1).padStart(2,'0'), name:e.name, reps:e.sets+'×'+e.reps, catColor:this.cat(e.cat), onOpen:()=>this.openEx(e.id, slot)}; }) };
+
+    // next BJJ
+    let nextBjj='—';
+    for(let k=0;k<7;k++){ const j=(tIdx+k)%7; if(this.WEEK[j].type==='bjj'){ nextBjj = k===0?'HOY': k===1?'MAÑANA': this.DAYNAMES[j]; break; } }
+
+    // week strip
+    const weekStrip = this.WEEK.map((w,i)=>{
+      const active = i===tIdx;
+      const done = w.dayId && completed[w.dayId];
+      const dot = done? '#22C55E' : w.type==='strength'? (active?'#0B0C0E':'#4B5058') : w.type==='bjj'? '#EAB308' : w.type==='cond'? '#F43F5E' : '#3A3F46';
+      return { d:w.d, bg: active? A : '#15171B', border: active? A : 'rgba(255,255,255,.07)', labelColor: active? '#0B0C0E' : '#8B9096',
+        dot, onClick: ()=>this.setState({tab:'semana'}) };
+    });
+
+    // week full
+    const kindMap = {strength:'Fuerza', bjj:'JiuJitsu', cond:'Gas Tank', rest:'Recuperación'};
+    const iconMap = {strength:'🏋️', bjj:'🥋', cond:'🫁', rest:'🌙'};
+    const weekFull = this.WEEK.map((w,i)=>{
+      const day = w.dayId? this.DAYS.find(d=>d.id===w.dayId) : null;
+      const isToday = i===tIdx;
+      const done = day && completed[day.id];
+      const accent = day? day.accent : w.type==='bjj'? '#EAB308' : '#6B7076';
+      const title = day? day.focus : w.type==='bjj'? 'Clase / Sparring' : 'Descanso activo';
+      const base = { d:w.d, num:day? day.num : (w.type==='bjj'?'○':'—'), kind:kindMap[w.type], title, accent, icon: done? '✅' : iconMap[w.type],
+        cardBg: isToday? 'rgba(255,74,28,.05)' : '#15171B', cardBorder: isToday? 'rgba(255,74,28,.28)':'rgba(255,255,255,.07)',
+        hasList: !!day, rowBg:'#15171B' };
+      base.exs = day? day.items.map(slot=>{ const e=this.effEx(slot); return {name:e.name, reps:e.sets+'×'+e.reps, catColor:this.cat(e.cat), onOpen:()=>this.openEx(e.id, slot)}; }) : [];
+      base.onStart = day? ()=>this.startSession(day.id) : ()=>{};
+      base.startLabel = done? 'Completado ✓ · Repetir' : 'Empezar sesión ▸';
+      base.startBg = done? 'rgba(34,197,94,.14)' : accent;
+      base.startColor = done? '#22C55E' : '#0B0C0E';
+      return base;
+    });
+
+    // library (accent-insensitive search)
+    const q = this.norm(this.state.q.trim());
+    const catList = ['Todos','Tracción','Empuje','Pierna','Potencia','Core','Agarre','Movilidad','Cardio'];
+    const cats = catList.map(c=>{
+      const sel = this.state.libCat===c;
+      const col = c==='Todos'? A : this.cat(c);
+      return { label:c, color: sel? '#0B0C0E':'#C9CDD3', bg: sel? col:'#15171B', border: sel? col:'rgba(255,255,255,.09)', onClick:()=>this.setState({libCat:c}) };
+    });
+    const libList = this.LIB.filter(e=> (this.state.libCat==='Todos'||e.cat===this.state.libCat) && (!q || this.norm(e.name).includes(q)))
+      .map(e=>({ name:e.name, cat:e.cat, equip:e.equip, abbr:this.ab(e.cat), catColor:this.cat(e.cat), onOpen:()=>this.openEx(e.id, null) }));
+
+    // detail
+    let ex = null;
+    if(this.state.ex){ const e=this.state.ex; const slot=this.state.slot;
+      ex = { name:e.name, cat:e.cat, catColor:this.cat(e.cat), equip:e.equip, setsN:e.sets, repsN:e.reps, restLabel:this.restStr(e.rest),
+        why:e.why, cues:e.cues.map((t,i)=>({n:i+1, text:t})), muscles:e.muscles,
+        canSwap: slot!=null && this.patCount(e.pattern)>1, onSwap:()=>this.openSwap(slot) };
+    }
+
+    // swap picker (with restore-original)
+    let swapList = [], swapTitle = '';
+    if(this.state.swapSlot!=null){ const slot=this.state.swapSlot; const cur=this.effEx(slot); swapTitle=cur.name;
+      swapList = this.LIB.filter(x=>x.pattern===cur.pattern).map(x=>{
+        const isCur=x.id===cur.id; const isOrig=x.id===slot;
+        return { name:x.name, equip:x.equip, reps:x.sets+'×'+x.reps, catColor:this.cat(x.cat),
+          border: isCur? A : 'rgba(255,255,255,.08)', bg: isCur? 'rgba(255,74,28,.08)':'#15171B',
+          tag: isCur? 'ACTUAL' : isOrig? 'ORIGINAL ▸' : 'ELEGIR ▸', tagColor: isCur? A : isOrig? '#22C55E' : '#8B9096',
+          onPick:()=> isCur? this.closeSwap() : this.doSwap(slot, x.id) }; }); }
+
+    // ── progress from real history ──
+    const last6 = hist.slice(-6);
+    const fmtD = ts => new Date(ts).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'});
+    const emptyChart = (msg)=> React.createElement('div',{style:{padding:'20px 8px', color:'#7A8087', fontSize:13, textAlign:'center', lineHeight:1.5}}, msg);
+    let volumeChart, volDelta='—';
+    if(last6.length){
+      const maxV = Math.max(...last6.map(d=>d.volume),1);
+      volumeChart = React.createElement('svg', {viewBox:'0 0 320 130', style:{width:'100%',height:'auto',display:'block'}},
+        last6.map((d,i)=>{ const h=Math.max(4,(d.volume/maxV)*90); const w=Math.min(40, 292/last6.length-10); const x=14+i*(292/last6.length); const last=i===last6.length-1;
+          return React.createElement('g',{key:i},
+            React.createElement('rect',{x, y:100-h, width:w, height:h, rx:5, fill: last? A : '#2A2E35'}),
+            React.createElement('text',{x:x+w/2, y:118, fill:'#6B7076', fontSize:10, fontFamily:'JetBrains Mono, monospace', textAnchor:'middle'}, fmtD(d.ts))); }));
+      if(last6.length>1){ const a=last6[last6.length-2].volume||1, b=last6[last6.length-1].volume;
+        const pct=Math.round(((b-a)/a)*100); volDelta = (pct>=0?'▲ ':'▼ ')+Math.abs(pct)+'%'; }
+    } else volumeChart = emptyChart('Sin datos todavía. Completa y guarda un entreno para ver tu volumen.');
+    // grip = carry/wrist weights over sessions
+    const gripPts = hist.map(h=>{ const b=h.best||{}; const w=(b.farmer&&b.farmer.w)||(b.wrist&&b.wrist.w)||0; return w? {ts:h.ts, w}:null; }).filter(Boolean).slice(-6);
+    let gripChart;
+    if(gripPts.length>1){
+      const maxG=Math.max(...gripPts.map(d=>d.w)), minG=Math.min(...gripPts.map(d=>d.w));
+      const gy = v => 95 - ((v-minG)/(maxG-minG||1))*80;
+      const step = 292/Math.max(gripPts.length-1,1);
+      const pts = gripPts.map((d,i)=> (14+i*step)+','+gy(d.w)).join(' ');
+      gripChart = React.createElement('svg',{viewBox:'0 0 320 130', style:{width:'100%',height:'auto',display:'block'}},
+        React.createElement('polyline',{points:pts, fill:'none', stroke:A, strokeWidth:2.5, strokeLinecap:'round', strokeLinejoin:'round'}),
+        gripPts.map((d,i)=>{ const x=14+i*step; return React.createElement('g',{key:i},
+          React.createElement('circle',{cx:x, cy:gy(d.w), r: i===gripPts.length-1?5:3.5, fill:'#0B0C0E', stroke:A, strokeWidth:2.5}),
+          React.createElement('text',{x, y:118, fill:'#6B7076', fontSize:10, fontFamily:'JetBrains Mono, monospace', textAnchor:'middle'}, fmtD(d.ts))); }));
+    } else gripChart = emptyChart('Registra Farmer\u2019s carry o trabajo de muñeca en al menos 2 sesiones para ver tu curva de agarre.');
+    // PRs from history
+    const bestAll = {};
+    hist.forEach(h=>{ Object.keys(h.best||{}).forEach(id=>{ const b=h.best[id]; if(!bestAll[id]||b.w>bestAll[id].w) bestAll[id]={...b}; }); });
+    const prs = Object.keys(bestAll).map(id=>({ lift:bestAll[id].name||(this.ex(id)&&this.ex(id).name)||id, w:bestAll[id].w, val:bestAll[id].w+' kg × '+bestAll[id].r }))
+      .sort((a,b)=>b.w-a.w).slice(0,5);
+
+    // session
+    let sess = null;
+    if(this.state.session){ const st=this.state.session; const day=this.DAYS.find(d=>d.id===st.dayId);
+      const slot = day.items[st.idx]; const e = this.effEx(slot); const rows = st.logs[slot];
+      const allDone = rows.every(r=>r.done);
+      const isLast = st.idx === day.items.length-1;
+      const isTimer = !!e.timer;
+      const isSimple = !isTimer && e.pattern==='mobility';
+      const simpleDone = rows[0] && rows[0].done;
+      let t=null;
+      if(isTimer){ const it=this.state.itimer||{}; const cfg=e.timer;
+        const phaseTotal = it.phase==='rest'? cfg.rest : cfg.work;
+        t = { phase: it.done? 'COMPLETADO ✓' : it.phase==='rest'? 'RECUPERA' : 'TRABAJO',
+          phaseColor: it.done? '#22C55E' : it.phase==='rest'? '#22C55E' : (day.accent||A),
+          time: this.mmss(Math.max(0,it.remaining||0)), round: Math.min(it.round||1, cfg.rounds), rounds: cfg.rounds,
+          pct: phaseTotal? Math.round(((it.remaining||0)/phaseTotal)*100)+'%' : '0%',
+          btnLabel: it.done? 'Hecho ✓' : it.running? 'Pausa' : 'Iniciar',
+          btnBg: it.done? 'rgba(34,197,94,.15)' : it.running? '#1D2026' : (day.accent||A),
+          btnColor: it.done? '#22C55E' : it.running? '#C9CDD3' : '#0B0C0E',
+          onToggle: ()=>{ if(this.state.itimer && !this.state.itimer.done) this.setState({itimer:{...this.state.itimer, running:!this.state.itimer.running}}); },
+          onReset: ()=> this.setState({itimer:this.initTimer(slot)}) };
+      }
+      sess = {
+        dayName:day.name, focus:day.focus, accent:day.accent, clock:this.state.nowMin+' min',
+        pos:st.idx+1, total:day.items.length, progressPct: Math.round((st.idx/(day.items.length))*100)+'%',
+        exName:e.name, exCat:e.cat, exCatColor:this.cat(e.cat), exTarget:e.sets+' × '+e.reps, exEquip:e.equip,
+        isTimer, isSimple, isSets:(!isTimer && !isSimple), t,
+        onSimpleDone:()=>this.checkSet(0),
+        simpleLabel: simpleDone? 'Completado ✓' : 'Marcar como hecho',
+        simpleBg: simpleDone? 'rgba(34,197,94,.14)' : '#15171B',
+        simpleBorder: simpleDone? 'rgba(34,197,94,.4)' : 'rgba(255,255,255,.14)',
+        simpleColor: simpleDone? '#22C55E' : '#C9CDD3',
+        onInfo:()=>this.openEx(e.id, slot), onSwap:()=>this.openSwap(slot), onEnd:this.endSession, onAdvance:this.advance,
+        onPrev:this.goPrev, prevColor: st.idx>0? '#C9CDD3' : '#3A3F46',
+        btnLabel: isLast? 'Finalizar entreno ✓' : (allDone? 'Siguiente ejercicio ▸' : 'Siguiente ejercicio'),
+        btnBg: allDone? day.accent : '#1D2026', btnColor: allDone? '#0B0C0E':'#8B9096',
+        restActive: this.state.rest>0, restLabel:this.mmss(this.state.rest),
+        restPct: this.state.restTotal? Math.round((this.state.rest/this.state.restTotal)*100)+'%':'0%',
+        onSkipRest:this.skipRest,
+        sets: rows.map((r,i)=>({ n:i+1, weight:r.weight, reps:r.reps,
+          rowBg: r.done? 'rgba(34,197,94,.08)':'#15171B', rowBorder: r.done? 'rgba(34,197,94,.35)':'rgba(255,255,255,.07)',
+          numColor: r.done? '#22C55E':'#7A8087',
+          checkBg: r.done? '#22C55E':'rgba(255,255,255,.06)', checkColor: r.done? '#0B0C0E':'#7A8087',
+          onCheck:()=>this.checkSet(i), onWMinus:()=>this.adj(i,'weight',-2.5), onWPlus:()=>this.adj(i,'weight',2.5),
+          onWSet:(ev)=>this.setW(i, ev.target.value),
+          onRMinus:()=>this.adj(i,'reps',-1), onRPlus:()=>this.adj(i,'reps',1) })) };
+    }
+
+    // summary
+    let sum=null;
+    if(this.state.sum){ const s=this.state.sum;
+      sum = { dayName:s.dayName, focus:s.focus, duration:s.duration, volume:s.volume, sets:s.sets,
+        hasPrs:s.prs.length>0, prs:s.prs, onSave:this.saveSession, onDiscard:this.endSession }; }
+
+    const detailDrag = this.makeDrag('detail');
+    const swapDrag = this.makeDrag('swap');
+
+    return {
+      dark:true, devW:402, devH:874, A, unit,
+      isHoy: tab==='hoy', isSemana: tab==='semana', isRegistro: tab==='registro', isBiblioteca: tab==='biblioteca',
+      tabs, athleteName:this.props.athleteName||'ATLETA', todayLabel, streak:hist.length,
+      weekCount: Object.keys(completed).length+' / '+this.DAYS.length, nextBjj,
+      today, weekStrip, weekFull, cats, libList, libCount:this.LIB.length, q:this.state.q,
+      onSearch:(ev)=>this.setState({q:ev.target.value}),
+      prs, prsHas:prs.length>0, prsEmpty:prs.length===0, volumeChart, gripChart, volDelta,
+      detailOpen:this.state.detailOpen, ex, closeDetail:this.closeDetail,
+      detailDrag, swapDrag,
+      detailY: this._dragKind==='detail'? this.state.sheetY:0,
+      swapY: this._dragKind==='swap'? this.state.sheetY:0,
+      swapOpen:this.state.swapOpen, swapList, swapTitle, closeSwap:this.closeSwap,
+      startToday:()=>this.startSession(dayObj.id),
+      sumOpen:this.state.sumOpen, sum,
+      sessionActive: !!this.state.session, sess };
+  }
+}
+</script>
+</body>
+</html>
